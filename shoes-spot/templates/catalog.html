@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Каталог{% endblock %}
+{% block content %}
+
+<h2>Търсене на обувки</h2>
+<form method="GET" action="{{ url_for('catalog.catalog') }}">
+    <input type="text" name="query" placeholder="Търси по име или цвят" value="{{ request.args.get('query', '') }}">
+    <button type="submit">Търси</button>
+</form>
+<br><br>
+    <hr>
+
+<h2>Филтриране на обувки</h2>
+<form method="GET" action="{{ url_for('catalog.catalog') }}" style="margin-top: 10px;">
+    <input type="number" step="0.01" name="min_price" placeholder="Мин. цена" value="{{ request.args.get('min_price', '') }}">
+    <input type="number" step="0.01" name="max_price" placeholder="Макс. цена" value="{{ request.args.get('max_price', '') }}">
+    <input type="number" name="size" placeholder="Размер" value="{{ request.args.get('size', '') }}">
+    <label><input type="checkbox" name="in_stock" {% if request.args.get('in_stock') %}checked{% endif %}> Само налични</label>
+    <button type="submit">Филтрирай</button>
+</form>
+    <br><br>
+
+<hr>
+<h2>Каталог с обувки</h2>
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Име</th>
+        <th>Описание</th>
+        <th>Цвят</th>
+        <th>Размери</th>
+        <th>Цена</th>
+        <th>Наличност</th>
+        {% if session.get('user') and session['user']['role'] == 'admin' %}
+        <th>Действия</th>
+        {% endif %}
+    </tr>
+
+    {% for product in products %}
+    <tr>
+        {% if session.get('user') and session['user']['role'] == 'admin' %}
+        <form method="POST" action="{{ url_for('catalog.edit', product_id=product.id) }}">
+            <td><input type="text" name="name" value="{{ product.name }}"></td>
+            <td><input type="text" name="description" value="{{ product.description }}"></td>
+            <td><input type="text" name="color" value="{{ product.color }}"></td>
+            <td><input type="text" name="sizes" value="{{ product.sizes|join(', ') }}"></td>
+            <td><input type="number" step="0.01" name="price" value="{{ product.price }}"></td>
+            <td><input type="number" name="stock" value="{{ product.stock }}"></td>
+            <td>
+                <button type="submit">Запази</button>
+                <a href="{{ url_for('catalog.delete', product_id=product.id) }}">Изтрий</a>
+            </td>
+        </form>
+        {% else %}
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.color }}</td>
+        <td>{{ product.sizes|join(', ') }}</td>
+        <td>{{ product.price }} лв.</td>
+        <td>{{ product.stock }}</td>
+        <td>
+            <a href="{{ url_for('cart.add_to_cart', product_id=product.id) }}">Добави в кошницата</a>
+        </td>
+{% endif %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% if session.get('user') and session['user']['role'] == 'admin' %}
+    <br><br><hr>
+<h3>Добави нов продукт</h3>
+<form method="POST" action="{{ url_for('catalog.add') }}">
+    <input type="text" name="name" placeholder="Име" required>
+    <input type="text" name="description" placeholder="Описание" required>
+    <input type="text" name="color" placeholder="Цвят" required>
+    <input type="text" name="sizes" placeholder="Пример: 40,41,42" required>
+    <input type="number" step="0.01" name="price" placeholder="Цена" required>
+    <input type="number" name="stock" placeholder="Наличност" required>
+    <button type="submit">Добави</button>
+</form>
+{% endif %}
+{% endblock %}
