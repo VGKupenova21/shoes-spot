@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Flask App{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav>
+    {% if session.get('user') %}
+  <a href="{{ url_for('catalog.catalog') }}">Каталог</a>
+
+  {% if session.user.role == 'user' %}
+    <a href="{{ url_for('cart.view_cart') }}">Кошница</a>
+  {% endif %}
+
+  <a href="{{ url_for('auth.logout') }}">Изход</a>
+{% else %}
+  <a href="{{ url_for('index') }}">Начало</a>
+  <a href="{{ url_for('auth.login') }}">Вход</a>
+  <a href="{{ url_for('auth.register') }}">Регистрация</a>
+{% endif %}
+
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>
