@@ -1,7 +1,15 @@
 from services.cart_service import get_cart, clear_cart
 from services.catalog_service import products
 
-class OrderService:
+class BaseOrderService:
+    def place_order(self, username, address, payment):
+        raise NotImplementedError
+
+    def get_orders(self):
+        raise NotImplementedError
+
+
+class OrderService(BaseOrderService):
     def __init__(self):
         self.orders = []
 
@@ -25,9 +33,17 @@ class OrderService:
             "payment": payment
         }
         self.orders.append(order)
-
         clear_cart(username)
         return True
 
     def get_orders(self):
         return self.orders
+
+
+class ExpressOrderService(OrderService):
+    def place_order(self, username, address, payment):
+        print("Обработваме експресна поръчка...")
+        result = super().place_order(username, address, payment)
+        if result:
+            print("Експресната поръчка е приета!")
+        return result
