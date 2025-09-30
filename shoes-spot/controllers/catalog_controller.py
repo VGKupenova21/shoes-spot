@@ -12,6 +12,8 @@ def catalog():
     max_price = request.args.get("max_price", type=float)
     size = request.args.get("size", type=int)
     in_stock = request.args.get("in_stock")
+    category = request.args.get("category")
+    gender = request.args.get("gender")
 
     products = search_and_filter_products(
         query=query,
@@ -19,7 +21,9 @@ def catalog():
         min_price=min_price,
         max_price=max_price,
         size=size,
-        in_stock=True if in_stock else False
+        in_stock=True if in_stock else False,
+        category=category,
+        gender=gender
     )
 
     return render_template("catalog.html", products=products)
@@ -36,6 +40,8 @@ def add():
     sizes = [int(s.strip()) for s in request.form.get("sizes").split(",")]
     price = float(request.form.get("price"))
     stock = int(request.form.get("stock"))
+    category = request.form.get("category")
+    gender = request.form.get("gender")
 
     create_product({
         "name": name,
@@ -43,11 +49,14 @@ def add():
         "color": color,
         "sizes": sizes,
         "price": price,
-        "stock": stock
+        "stock": stock,
+        "category": category,
+        "gender": gender
     })
 
     flash("Продуктът беше добавен успешно!", "success")
     return redirect(url_for("catalog.catalog"))
+
 
 @catalog_bp.route("/edit/<int:product_id>", methods=["POST"])
 def edit(product_id):
@@ -61,7 +70,9 @@ def edit(product_id):
         "color": request.form.get("color"),
         "sizes": [int(s.strip()) for s in request.form.get("sizes").split(",")],
         "price": float(request.form.get("price")),
-        "stock": int(request.form.get("stock"))
+        "stock": int(request.form.get("stock")),
+        "category": request.form.get("category"),
+        "gender": request.form.get("gender")
     }
     update_product(product_id, new_data)
     flash("Продуктът е редактиран!", "success")
@@ -76,3 +87,4 @@ def delete(product_id):
     delete_product(product_id)
     flash("Продуктът е изтрит!", "info")
     return redirect(url_for("catalog.catalog"))
+
