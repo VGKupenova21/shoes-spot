@@ -170,3 +170,132 @@ footer {
     width: 100%;
     font-size: 14px;
 }
+
+.categories {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px;
+}
+.categories a {
+    text-align: center;
+    text-decoration: none;
+    color: black;
+}
+.categories img {
+    width: 250px;
+    height: 200px;
+    border-radius: 15px;
+    transition: transform 0.3s;
+}
+.categories img:hover {
+    transform: scale(1.05);
+}
+
+.products {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+.product {
+    text-align: center;
+}
+.product img {
+    width: 200px;
+    height: 150px;
+    border-radius: 10px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.product-card h3 {
+    margin: 10px 0;
+}
+
+.product-card .btn {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.product-card .btn:hover {
+    background: #0056b3;
+}
+
+.auth_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    width: 350px;
+    text-align: center;
+}
+
+.card h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    text-align: left;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.btn {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: #0056b3;
+}
