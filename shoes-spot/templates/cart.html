@@ -4,29 +4,27 @@
 {% block content %}
 <h2>Кошница</h2>
 
-{% if cart %}
+{% if items %}
 <table>
     <tr>
         <th>Продукт</th>
         <th>Цена</th>
         <th>Количество</th>
         <th>Сума</th>
-        <th>Действие</th>
     </tr>
-    {% for item in cart %}
-    <tr>
-        <td>{{ item.name }}</td>
-        <td>{{ item.price }} лв.</td>
-        <td>{{ item.quantity }}</td>
-        <td>{{ item.subtotal }} лв.</td>
-        <td><a href="{{ url_for('cart.remove_from_cart', product_id=item.id) }}">Премахни продукта</a></td>
-    </tr>
-    {% endfor %}
+{% for item in items %}
+  <tr>
+    <td>{{ item.product_name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{{ item.price }}</td>
+    <td>{{ item.quantity * item.price }}</td>
+  </tr>
+{% endfor %}
 </table>
 
 <p><strong>Общо сума: {{ total }} лв.</strong></p>
 
-<form action="{{ url_for('cart.clear_cart') }}" method="GET" style="display:inline;">
+<form action="{{ url_for('cart.clear_cart_route') }}" method="GET" style="display:inline;">
     <button type="submit">Изчисти кошницата</button>
 </form>
 
