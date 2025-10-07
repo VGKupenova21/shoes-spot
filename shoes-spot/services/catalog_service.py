@@ -1,160 +1,109 @@
-products = [
-    {
-        "id": 1,
-        "name": "Rebook",
-        "description": "Обувките са перфектни за всякакви спортове",
-        "color": "Розов",
-        "sizes": [38, 39, 40, 41],
-        "price": 75.99,
-        "stock": 10,
-        "category": "sport",
-        "gender": "women"
-    },
-    {
-        "id": 2,
-        "name": "Adidas",
-        "description": "Обувки са с модерен привкус и са перфектни за спортове на закрито.",
-        "color": "Розов",
-        "sizes": [39, 40, 41, 42, 44],
-        "price": 206.99,
-        "stock": 17,
-        "category": "sport",
-        "gender": "women"
-    },
-    {
-        "id": 3,
-        "name": "Nike InfinityRN",
-        "description": "Маратонките осигуряват ултракомфорт и са подходящи за бягане",
-        "color": "Бял",
-        "sizes": [38, 39, 40, 41, 42],
-        "price": 329.99,
-        "stock": 5,
-        "category": "sport",
-        "gender": "men"
-    },
+from app import db
 
-    {
-        "id": 101,
-        "name": "Lasocki",
-        "description": "Елегантни официални обувки за специални поводи",
-        "color": "Черен",
-        "sizes": [40, 41, 42, 43],
-        "price": 104.99,
-        "stock": 6,
-        "category": "formal",
-        "gender": "men"
-    },
-    {
-        "id": 102,
-        "name": "Pikolinos",
-        "description": "Класически стил с високо качество",
-        "color": "Кафяв",
-        "sizes": [42, 43, 44],
-        "price": 277.99,
-        "stock": 4,
-        "category": "formal",
-        "gender": "men"
-    },
-    {
-        "id": 103,
-        "name": "Aldo",
-        "description": "Официални мокасини за всеки ден",
-        "color": "Бял",
-        "sizes": [38, 40, 41],
-        "price": 134.99,
-        "stock": 9,
-        "category": "formal",
-        "gender": "women"
-    },
+class Product(db.Model):
+    __tablename__ = "products"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    color = db.Column(db.String(50))
+    sizes = db.Column(db.String(200))
+    price = db.Column(db.Float, nullable=False)
+    stock = db.Column(db.Integer, default=0)
+    category = db.Column(db.String(50))
+    gender = db.Column(db.String(10))
 
-    {
-        "id": 201,
-        "name": "s.Oliver",
-        "description": "Удобни ежедневни обувки за всеки стил",
-        "color": "Кафяв",
-        "sizes": [40, 41, 42, 45],
-        "price": 90.00,
-        "stock": 12,
-        "category": "casual",
-        "gender": "men"
-    },
-    {
-        "id": 202,
-        "name": "Jana",
-        "description": "Ежедневни и красиви дамски обувки",
-        "color": "Бял",
-        "sizes": [37, 39, 40, 41],
-        "price": 73.00,
-        "stock": 11,
-        "category": "casual",
-        "gender": "women"
-    },
-    {
-        "id": 203,
-        "name": "Geox",
-        "description": "Меки и удобни за целодневно носене",
-        "color": "Бял",
-        "sizes": [38, 40, 41],
-        "price": 140.00,
-        "stock": 10,
-        "category": "casual",
-        "gender": "women"
-    }
-]
 
+    def get_sizes_list(self):
+        if not self.sizes:
+            return []
+        return [s.strip() for s in self.sizes.split(",")]
 
 def get_products_by_category(category):
-    return [p for p in products if p.get("category") == category]
+    return Product.query.filter_by(category=category).all()
 
 def get_all_products():
-    return products
+    return Product.query.all()
 
 def get_product_by_id(product_id):
-    return next((p for p in products if p["id"] == product_id), None)
+    return Product.query.get(product_id)
 
 def create_product(product_data):
-    new_id = max([p["id"] for p in products], default=0) + 1
-    product_data["id"] = new_id
-    products.append(product_data)
-    return product_data
+    sizes_value = product_data.get("sizes")
+
+    if isinstance(sizes_value, list):
+        sizes_value = ",".join(map(str, sizes_value))
+
+    product = Product(
+        name=product_data["name"],
+        description=product_data["description"],
+        color=product_data["color"],
+        sizes=sizes_value,
+        price=product_data["price"],
+        stock=product_data["stock"],
+        category=product_data["category"],
+        gender=product_data["gender"]
+    )
+    db.session.add(product)
+    db.session.commit()
+    return product
 
 def update_product(product_id, new_data):
     product = get_product_by_id(product_id)
-    if product:
-        product.update(new_data)
-        return True
-    return False
+    if not product:
+        return False
+
+    product.name = new_data.get("name", product.name)
+    product.description = new_data.get("description", product.description)
+    product.color = new_data.get("color", product.color)
+
+    if "sizes" in new_data:
+        sizes_value = new_data["sizes"]
+        if isinstance(sizes_value, list):
+            sizes_value = ",".join(map(str, sizes_value))
+        product.sizes = sizes_value
+
+    product.price = new_data.get("price", product.price)
+    product.stock = new_data.get("stock", product.stock)
+    product.category = new_data.get("category", product.category)
+    product.gender = new_data.get("gender", product.gender)
+
+    db.session.commit()
+    return True
 
 def delete_product(product_id):
-    global products
-    products = [p for p in products if p["id"] != product_id]
+    product = get_product_by_id(product_id)
+    if product:
+        db.session.delete(product)
+        db.session.commit()
 
-def search_and_filter_products(query=None, color=None, min_price=None, max_price=None, size=None, in_stock=None, category=None, gender=None):
-    results = products
+def search_and_filter_products(query=None, color=None, min_price=None, max_price=None,
+                               size=None, in_stock=None, category=None, gender=None):
+    q = Product.query
 
     if category:
-        results = [p for p in results if p["category"] == category]
+        q = q.filter(Product.category == category)
     if gender:
-        results = [p for p in results if p["gender"] == gender]
+        q = q.filter(Product.gender == gender)
     if query:
-        results = [p for p in results if query.lower() in p["name"].lower() or query.lower() in p["color"].lower()]
+        search = f"%{query.lower()}%"
+        q = q.filter(db.or_(Product.name.ilike(search), Product.color.ilike(search)))
     if color:
-        results = [p for p in results if p["color"].lower() == color.lower()]
+        q = q.filter(Product.color.ilike(color))
     if min_price is not None:
-        results = [p for p in results if p["price"] >= min_price]
+        q = q.filter(Product.price >= min_price)
     if max_price is not None:
-        results = [p for p in results if p["price"] <= max_price]
-    if size is not None:
-        results = [p for p in results if size in p["sizes"]]
+        q = q.filter(Product.price <= max_price)
     if in_stock:
-        results = [p for p in results if p["stock"] > 0]
+        q = q.filter(Product.stock > 0)
+    if size:
+        q = q.filter(Product.sizes.like(f"%{size}%"))
 
-    return results
-
+    return q.all()
 
 def update_product_stock(product_id, quantity=1):
     product = get_product_by_id(product_id)
-    if product and product["stock"] >= quantity:
-        product["stock"] -= quantity
+    if product and product.stock >= quantity:
+        product.stock -= quantity
+        db.session.commit()
         return True
     return False

@@ -14,7 +14,7 @@
 <form method="GET" action="{{ url_for('catalog.catalog') }}" style="margin-top: 10px;">
     <input type="number" step="0.01" name="min_price" placeholder="Мин. цена" value="{{ request.args.get('min_price', '') }}">
     <input type="number" step="0.01" name="max_price" placeholder="Макс. цена" value="{{ request.args.get('max_price', '') }}">
-    <input type="number" name="size" placeholder="Размер" value="{{ request.args.get('size', '') }}">
+    <input type="number" name="size" placeholder="Размер" value="{{ request.args.get('size') }}">
     <label><input type="checkbox" name="in_stock" {% if request.args.get('in_stock') %}checked{% endif %}> Само налични</label>
 
     <select name="category">
@@ -52,7 +52,7 @@
             <input type="text" name="name" value="{{ product.name }}">
             <input type="text" name="description" value="{{ product.description }}">
             <input type="text" name="color" value="{{ product.color }}">
-            <input type="text" name="sizes" value="{{ product.sizes|join(', ') }}">
+            <input type="text" name="sizes" value="{{ product.sizes }}">
             <input type="number" step="0.01" name="price" value="{{ product.price }}">
             <input type="number" name="stock" value="{{ product.stock }}">
             <input type="text" name="category" value="{{ product.category }}">
@@ -66,10 +66,10 @@
         <h3>{{ product.name }}</h3>
         <p>{{ product.description }}</p>
         <p><b>Цвят:</b> {{ product.color }}</p>
-        <p><b>Размери:</b> {{ product.sizes|join(', ') }}</p>
+        <p><b>Размери:</b> {{ product.sizes}}</p>
         <p><b>Цена:</b> {{ product.price }} лв.</p>
         <p><b>Наличност:</b> {{ product.stock }}</p>
-        <a href="{{ url_for('cart.add_to_cart', product_id=product.id) }}" class="btn">Добави в кошницата</a>
+        <a href="{{ url_for('cart.add_to_cart_route', product_id=product.id) }}" class="btn">Добави в кошницата</a>
         {% endif %}
     </div>
     {% endfor %}
